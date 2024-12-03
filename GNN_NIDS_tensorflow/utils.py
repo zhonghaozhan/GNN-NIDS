@@ -54,18 +54,10 @@ def _get_compiled_model(params):
 import glob
 def make_or_restore_model(params):
     # Either restore the latest model, or create a fresh one
-
     checkpoint_dir = os.path.abspath(params['DIRECTORIES']['logs'] + '/ckpt')
     # if there is no checkpoint available.
     if not os.path.exists(checkpoint_dir):
         os.makedirs(checkpoint_dir)
     
-    checkpoints = glob.glob(checkpoint_dir + "/weights*")
-    
-    gnn = _get_compiled_model(params)
-    if checkpoints:
-        latest_checkpoint = max(checkpoints, key=os.path.getctime)
-        print("Restoring from", latest_checkpoint)
-        return gnn.load_weights(latest_checkpoint)
     print("Creating a new model")
-    return gnn
+    return _get_compiled_model(params)

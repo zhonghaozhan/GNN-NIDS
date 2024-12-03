@@ -28,7 +28,17 @@ model = make_or_restore_model(params=params)
 
 # callbacks to save the model
 path_logs = os.path.abspath(params['DIRECTORIES']['logs'])
-callbacks = [tf.keras.callbacks.ModelCheckpoint(filepath=  path_logs + "/ckpt/weights.{epoch:02d}-{loss:.2f}.hdf5", save_freq='epoch', monitor='loss', save_best_only=False), tf.keras.callbacks.TensorBoard(log_dir=path_logs + "/logs", update_freq=1000)]
+callbacks = [
+    tf.keras.callbacks.ModelCheckpoint(
+        filepath=path_logs + "/ckpt/model_{epoch:02d}",
+        save_weights_only=False,
+        save_freq='epoch',
+        monitor='loss',
+        save_best_only=False,
+        save_format='tf'
+    ),
+    tf.keras.callbacks.TensorBoard(log_dir=path_logs + "/logs", update_freq=1000)
+]
 
 train_dataset = input_fn(data_path=os.path.abspath(params["DIRECTORIES"]["train"]), validation=False)
 val_dataset = input_fn(data_path=os.path.abspath(params["DIRECTORIES"]["validation"]), validation=True)
