@@ -49,6 +49,6 @@ model.fit(train_dataset,
           validation_steps = 600,
           steps_per_epoch=1600,
           batch_size=16,
-          epochs=2000,
+          epochs=400,
           callbacks=callbacks,
           use_multiprocessing=True)
