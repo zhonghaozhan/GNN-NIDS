@@ -16,6 +16,8 @@ import tensorflow_addons as tfa
 from GNN import GNN
 import os
 
+# Enable eager execution for debugging
+tf.config.run_functions_eagerly(True)
 
 def _get_compiled_model(params):
     model = GNN(params)
@@ -26,28 +28,26 @@ def _get_compiled_model(params):
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=decayed_lr)
     loss_object = tf.keras.losses.CategoricalCrossentropy()
-    metrics = [tf.keras.metrics.CategoricalAccuracy(), tf.keras.metrics.SpecificityAtSensitivity(0.1),
-               tf.keras.metrics.Recall(top_k=1,class_id=0, name='rec_0'), tf.keras.metrics.Precision(top_k=1, class_id=0, name='pre_0'),
-               tf.keras.metrics.Recall(top_k=1,class_id=1, name='rec_1'), tf.keras.metrics.Precision(top_k=1,class_id=1, name='pre_1'),
-               tf.keras.metrics.Recall(top_k=1,class_id=2, name='rec_2'), tf.keras.metrics.Precision(top_k=1,class_id=2, name='pre_2'),
-               tf.keras.metrics.Recall(top_k=1,class_id=3, name='rec_3'), tf.keras.metrics.Precision(top_k=1,class_id=3, name='pre_3'),
-               tf.keras.metrics.Recall(top_k=1,class_id=4, name='rec_4'), tf.keras.metrics.Precision(top_k=1,class_id=4, name='pre_4'),
-               tf.keras.metrics.Recall(top_k=1,class_id=5, name='rec_5'), tf.keras.metrics.Precision(top_k=1,class_id=5, name='pre_5'),
-               tf.keras.metrics.Recall(top_k=1,class_id=6, name='rec_6'), tf.keras.metrics.Precision(top_k=1,class_id=6, name='pre_6'),
-               tf.keras.metrics.Recall(top_k=1,class_id=7, name='rec_7'), tf.keras.metrics.Precision(top_k=1,class_id=7, name='pre_7'),
-               tf.keras.metrics.Recall(top_k=1,class_id=8, name='rec_8'), tf.keras.metrics.Precision(top_k=1,class_id=8, name='pre_8'),
-               tf.keras.metrics.Recall(top_k=1,class_id=9, name='rec_9'), tf.keras.metrics.Precision(top_k=1,class_id=9, name='pre_9'),
-               tf.keras.metrics.Recall(top_k=1,class_id=10, name='rec_10'), tf.keras.metrics.Precision(top_k=1, class_id=10, name='pre_10'),
-               tf.keras.metrics.Recall(top_k=1,class_id=11, name="rec_11"), tf.keras.metrics.Precision(top_k=1, class_id=11, name="pre_11"),
-               tf.keras.metrics.Recall(top_k=1,class_id=12, name="rec_12"), tf.keras.metrics.Precision(top_k=1, class_id=12, name='prec_12'),
-               tf.keras.metrics.Recall(top_k=1,class_id=13, name='rec_13'), tf.keras.metrics.Precision(top_k=1, class_id=13, name='prec_13'),
-               tf.keras.metrics.Recall(top_k=1,class_id=14, name='rec_14'), tf.keras.metrics.Precision(top_k=1, class_id=14, name='prec_14'),
-               tfa.metrics.F1Score(15,average='macro',name='macro_F1'),tfa.metrics.F1Score(15,average='weighted',name='weighted_F1')]#, tfma.metrics.MultiClassConfusionMatrixPlot(name='multi_class_confusion_matrix_plot'),],
+    
+    # Basic metrics
+    metrics = [
+        tf.keras.metrics.CategoricalAccuracy(),
+        tf.keras.metrics.AUC(curve='PR', name='pr_auc'),
+        tf.keras.metrics.AUC(curve='ROC', name='roc_auc')
+    ]
+    
+    # Add per-class metrics for all 15 classes
+    for i in range(15):
+        metrics.extend([
+            tf.keras.metrics.Recall(class_id=i, name=f'recall_{i}'),
+            tf.keras.metrics.Precision(class_id=i, name=f'precision_{i}')
+        ])
 
-    model.compile(loss=loss_object,
-                  optimizer=optimizer,
-                  metrics= metrics,
-                  run_eagerly=False)
+    model.compile(optimizer=optimizer,
+                 loss=loss_object,
+                 metrics=metrics,
+                 run_eagerly=True)  # Enable eager execution for debugging
+
     return model
 
 

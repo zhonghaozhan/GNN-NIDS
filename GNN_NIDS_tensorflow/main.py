@@ -20,6 +20,9 @@ from utils import make_or_restore_model
 from generator import input_fn
 import configparser
 
+# Enable debug mode for tf.data
+tf.data.experimental.enable_debug_mode()
+
 params = configparser.ConfigParser()
 params._interpolation = configparser.ExtendedInterpolation()
 params.read('./config.ini')
@@ -43,12 +46,32 @@ callbacks = [
 train_dataset = input_fn(data_path=os.path.abspath(params["DIRECTORIES"]["train"]), validation=False)
 val_dataset = input_fn(data_path=os.path.abspath(params["DIRECTORIES"]["validation"]), validation=True)
 
+# Check if datasets are empty
+print("Checking datasets...")
+try:
+    first_batch = next(iter(train_dataset))
+    print("First training batch shapes:")
+    print("Features:", {k: v.shape for k, v in first_batch[0].items()})
+    print("Labels:", first_batch[1].shape)
+except StopIteration:
+    print("Error: Training dataset is empty!")
+    raise
+
+try:
+    first_batch = next(iter(val_dataset))
+    print("First validation batch shapes:")
+    print("Features:", {k: v.shape for k, v in first_batch[0].items()})
+    print("Labels:", first_batch[1].shape)
+except StopIteration:
+    print("Error: Validation dataset is empty!")
+    raise
+
 # Training the model
 model.fit(train_dataset,
-          validation_data= val_dataset,
-          validation_steps = 600,
+          validation_data=val_dataset,
+          validation_steps=600,
           steps_per_epoch=1600,
           batch_size=16,
-          epochs=400,
+          epochs=int(params['HYPERPARAMETERS']['epochs']),
           callbacks=callbacks,
           use_multiprocessing=True)

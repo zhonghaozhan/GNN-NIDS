@@ -1,0 +1,9 @@
+# Core dependencies for inference
+tensorflow-lite==2.13.0  # TF Lite is better suited for RPi
+numpy==1.24.3
+networkx==3.2.1
+h5py==3.12.1
+
+# Optional utilities
+tqdm==4.67.1
+psutil==6.1.0  # For system monitoring

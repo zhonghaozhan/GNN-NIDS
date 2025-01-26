@@ -1,14 +1,10 @@
-# Virtual Environment
-venv/
-env/
-ENV/
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -20,27 +16,30 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
-# IDE
+# IDEs
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# Logs and databases
-*.log
-*.sqlite
-logs/
-
-# OS generated files
+# Mac
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Project specific
+model_backups/
+preprocessed_*/
+*.log
+*.png
+confusion_matrix.png
+
+# Tensorflow
+checkpoint
+*.ckpt.*
+*.pb
+events.out.tfevents.*
