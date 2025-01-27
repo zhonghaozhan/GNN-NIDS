@@ -20,6 +20,20 @@ from utils import make_or_restore_model
 from generator import input_fn
 import configparser
 
+# Enable MPS (Metal Performance Shaders) for Apple Silicon
+try:
+    if tf.config.list_physical_devices('GPU'):
+        print("GPU is available")
+    else:
+        print("No GPU found. Checking for Apple Metal...")
+        if tf.config.list_physical_devices('MPS'):
+            print("Apple Metal device found. Using MPS backend.")
+            tf.config.set_visible_devices(tf.config.list_physical_devices('MPS')[0], 'MPS')
+        else:
+            print("No accelerator found. Using CPU.")
+except:
+    print("Error checking devices. Falling back to CPU.")
+
 # Enable debug mode for tf.data
 tf.data.experimental.enable_debug_mode()
 
