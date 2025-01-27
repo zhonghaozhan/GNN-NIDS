@@ -34,8 +34,23 @@ try:
 except:
     print("Error checking devices. Falling back to CPU.")
 
-# Enable debug mode for tf.data
+# Enable memory growth to avoid allocating all GPU memory at once
+physical_devices = tf.config.list_physical_devices('GPU')
+if physical_devices:
+    print("GPU device found:", physical_devices[0].name)
+    try:
+        for device in physical_devices:
+            tf.config.experimental.set_memory_growth(device, True)
+    except RuntimeError as e:
+        print(e)
+
+# Performance optimizations
+tf.config.optimizer.set_jit(True)  # Enable XLA optimization
 tf.data.experimental.enable_debug_mode()
+
+# Set up mixed precision policy for faster training
+policy = tf.keras.mixed_precision.Policy('mixed_float16')
+tf.keras.mixed_precision.set_global_policy(policy)
 
 params = configparser.ConfigParser()
 params._interpolation = configparser.ExtendedInterpolation()
